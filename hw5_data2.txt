@@ -1,0 +1,6 @@
+M: N
+N: M O P R
+O: N Q
+P: R
+Q: P
+R: Q
