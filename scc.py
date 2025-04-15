@@ -6,7 +6,7 @@ class Graph:
         self.graph = defaultdict(list)
         self.vertices = set()
     
-    def add_edge(self, u: str, v: str) -> None:
+    def addEdge(self, u: str, v: str) -> None:
         self.graph[u].append(v)
         self.vertices.add(u)
         self.vertices.add(v)
@@ -15,26 +15,26 @@ class Graph:
         g_transpose = Graph()
         for u in self.graph:
             for v in self.graph[u]:
-                g_transpose.add_edge(v, u)
+                g_transpose.addEdge(v, u)
         return g_transpose
     
-    def dfs_util(self, v: str, visited: Set[str], collection: Union[List[str], Set[str]] = None) -> None:
+    def dfsUtil(self, v: str, visited: Set[str], collection: Union[List[str], Set[str]] = None) -> None:
         visited.add(v)
         for u in self.graph.get(v, []):
             if u not in visited:
-                self.dfs_util(u, visited, collection)
+                self.dfsUtil(u, visited, collection)
         if collection is not None:
             if isinstance(collection, list):
                 collection.append(v)
             else:
                 collection.add(v)
     
-    def get_strongly_connected_components(self) -> List[Set[str]]:
+    def getComponents(self) -> List[Set[str]]:
         visited = set()
         finish_order = []
         for vertex in sorted(self.vertices):
             if vertex not in visited:
-                self.dfs_util(vertex, visited, finish_order)
+                self.dfsUtil(vertex, visited, finish_order)
         transpose = self.transpose()
         visited = set()
         components = []
@@ -42,12 +42,12 @@ class Graph:
         for vertex in reversed(finish_order):
             if vertex not in visited:
                 component = set()
-                transpose.dfs_util(vertex, visited, component)
+                transpose.dfsUtil(vertex, visited, component)
                 components.append(component)
         
         return components
 
-    def create_component_matrix(self, components: List[Set[str]]) -> Dict:
+    def createMatrix(self, components: List[Set[str]]) -> Dict:
         vertex_to_component = {}
         for i, component in enumerate(components):
             for vertex in component:
@@ -65,7 +65,7 @@ class Graph:
         
         return matrix
 
-def read_graph_from_file(filename: str) -> Graph:
+def readGraph(filename: str) -> Graph:
     g = Graph()
     try:
         with open(filename, 'r') as f:
@@ -78,7 +78,7 @@ def read_graph_from_file(filename: str) -> Graph:
                 targets = parts[1].strip().split()
                 
                 for target in targets:
-                    g.add_edge(source, target)                
+                    g.addEdge(source, target)                
                 if not targets:
                     g.vertices.add(source)
                     
@@ -87,7 +87,7 @@ def read_graph_from_file(filename: str) -> Graph:
         print(f"Error: File '{filename}' not found.")
         return None
 
-def print_component_matrix(components: List[Set[str]], matrix: Dict) -> None:
+def printMatrix(components: List[Set[str]], matrix: Dict) -> None:
     n = len(components)
     
     print("   ", end="")
@@ -107,19 +107,19 @@ def print_component_matrix(components: List[Set[str]], matrix: Dict) -> None:
 def main():
     filename = input("Enter the input file name: ")
     
-    graph = read_graph_from_file(filename)
+    graph = readGraph(filename)
     if not graph:
         return
     
-    components = graph.get_strongly_connected_components()
-    matrix = graph.create_component_matrix(components)
+    components = graph.getComponents()
+    matrix = graph.createMatrix(components)
     
     print("\nStrongly Connected Components:")
     for i, component in enumerate(components):
         print(f"{i}: {sorted(component)}")
     
     print("\nComponent Adjacency Matrix:")
-    print_component_matrix(components, matrix)
+    printMatrix(components, matrix)
 
 if __name__ == "__main__":
     main() 
